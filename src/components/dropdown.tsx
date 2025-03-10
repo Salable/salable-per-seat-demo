@@ -5,7 +5,7 @@ import {useOnClickOutside} from "usehooks-ts";
 import {destroySession} from "@/app/actions/sessions";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
-import {Prisma, User} from "@prisma/client";
+import {User} from "@prisma/client";
 
 export const Dropdown = ({user, isAdmin}: {
   user: User | null;
