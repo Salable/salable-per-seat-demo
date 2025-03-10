@@ -2,6 +2,9 @@ import {getAllSubscriptions} from "@/fetch/subscriptions";
 import Link from "next/link";
 import React, {Suspense} from "react";
 import {FetchError} from "@/components/fetch-error";
+import {getSession} from "@/fetch/session";
+import {redirect} from "next/navigation";
+import {isUserAdmin} from "@/fetch/users";
 
 export const metadata = {
   title: 'Subscriptions',
@@ -21,6 +24,14 @@ export default async function SubscriptionPage() {
 }
 
 const SubscriptionsList = async () => {
+  const session = await getSession()
+  if (!session?.uuid) redirect('/')
+  const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid)
+  if (!isAdmin) {
+    return (
+      <div>Only organisation admins can view subscriptions.</div>
+    )
+  }
   const subscriptions = await getAllSubscriptions()
   return (
     <div>
@@ -32,14 +43,15 @@ const SubscriptionsList = async () => {
                    key={`subscription-${index}`}>
                 <div className='flex items-center'>
                   <div className='text-lg mr-2 leading-none'>{subscription.plan.displayName}</div>
-                  {subscription.plan.licenseType === 'perSeat' ? <span
-                    className='text-sm'>({subscription.quantity} seat{Number(subscription.quantity) > 1 ? "s" : ""})</span> : null}
+                  {subscription.plan.licenseType === 'perSeat' ? (
+                    <span className='text-sm'>({subscription.quantity} seat{Number(subscription.quantity) > 1 ? "s" : ""})</span>
+                  ) : null}
                 </div>
                 <div>
-                  {subscription.status === 'CANCELED' ? <span
-                    className='bg-red-200 text-red-500 text-xs uppercase p-1 leading-none rounded-sm font-bold mr-2'>{subscription.status}</span> : null}
-                  <Link className='text-blue-700 hover:underline'
-                        href={`/dashboard/subscriptions/${subscription.uuid}`}>View</Link>
+                  {subscription.status === 'CANCELED' ? (
+                    <span className='bg-red-200 text-red-500 text-xs uppercase p-1 leading-none rounded-sm font-bold mr-2'>{subscription.status}</span>
+                  ) : null}
+                  <Link className='text-blue-700 hover:underline' href={`/dashboard/subscriptions/${subscription.uuid}`}>View</Link>
                 </div>
               </div>
             ))

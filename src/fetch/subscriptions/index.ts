@@ -7,6 +7,7 @@ import {salable} from "@/app/salable";
 import {PaginatedSubscriptionInvoice, Subscription, Plan, PlanCurrency} from "@salable/node-sdk/dist/src/types";
 import {SalableResponseError} from "@salable/node-sdk";
 import {salableProductUuid} from "@/app/constants";
+import {isUserAdmin} from "@/fetch/users";
 
 export type SubscriptionExpandedPlan = Subscription & {
   plan: Plan
@@ -27,8 +28,15 @@ export async function getAllSubscriptions(): Promise<Result<GetAllSubscriptionsE
         error: 'Unauthorised'
       }
     }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     const data = await salable.subscriptions.getAll({
-      email: session.email,
+      owner: session.organisationUuid,
       expand: ['plan'],
       sort: 'desc',
       productUuid: salableProductUuid
@@ -53,6 +61,20 @@ export type SubscriptionExpandedPlanCurrency = Subscription & {
 
 export async function getOneSubscription(uuid: string): Promise<Result<SubscriptionExpandedPlanCurrency | null>> {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     const data = await salable.subscriptions.getOne(uuid, {expand: ['plan.currencies']}) as SubscriptionExpandedPlanCurrency
     return {
       data, error: null
@@ -74,6 +96,20 @@ export async function getOneSubscription(uuid: string): Promise<Result<Subscript
 
 export const getSubscriptionInvoices = async (subscriptionUuid: string): Promise<Result<PaginatedSubscriptionInvoice>> => {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     const data = await salable.subscriptions.getInvoices(subscriptionUuid)
     return {
       data, error: null
