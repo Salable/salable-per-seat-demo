@@ -3,7 +3,7 @@ import Link from "next/link";
 import {SalableLogo} from "@/components/salable-logo";
 import {Dropdown} from "@/components/dropdown";
 import {getSession} from "@/fetch/session";
-import {getOneUser} from "@/fetch/users";
+import {getOneUser, isUserAdmin} from "@/fetch/users";
 import React from "react";
 
 export const Header = async () => {
@@ -16,11 +16,12 @@ export const Header = async () => {
     )
   }
   const user = await getOneUser(session.uuid, session.organisationUuid);
+  const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
   return (
     <HeaderWrapper>
       <div className="flex justify-between items-center">
         {user.data ? (
-          <Dropdown user={user.data}/>
+          <Dropdown user={user.data} isAdmin={isAdmin}/>
         ) : user.error ? (
           <span className='text-red-600 text-sm'>{user.error}</span>
         ) : (

@@ -4,9 +4,28 @@ import {getOneSubscription} from "@/fetch/subscriptions";
 import {redirect} from "next/navigation";
 import {getOneEvent} from "@/fetch/events";
 import {salable} from "@/app/salable";
+import {isUserAdmin} from "@/fetch/users";
+import {getIronSession} from "iron-session";
+import {Session} from "@/app/actions/sign-in";
+import {cookies} from "next/headers";
+import {env} from "@/app/environment";
 
 export const changeSubscription = async (subscriptionUuid: string, planUuid: string) => {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     await salable.subscriptions.changePlan(subscriptionUuid, {planUuid})
     await new Promise<void>(async (resolve) => {
       while (true) {
@@ -39,6 +58,20 @@ export const addSeats = async ({
   increment: number,
 }) => {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     const create = await salable.subscriptions.addSeats(uuid, {increment})
     await pollSalableEvent(create.eventUuid)
   } catch (error) {
@@ -60,6 +93,20 @@ export const removeSeats = async ({
   decrement: number,
 }) => {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     const remove = await salable.subscriptions.removeSeats(uuid, {decrement})
     await pollSalableEvent(remove.eventUuid)
   } catch (error) {
@@ -75,6 +122,20 @@ export const removeSeats = async ({
 
 export const cancelSubscription = async (subscriptionUuid: string) => {
   try {
+    const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
+    if (!session) {
+      return {
+        data: null,
+        error: 'Unauthorised'
+      }
+    }
+    const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid);
+    if (!isAdmin) {
+      return {
+        data: null,
+        error: 'Unauthorised',
+      }
+    }
     await salable.subscriptions.cancel(subscriptionUuid, {when: 'now'})
     await new Promise<void>(async (resolve) => {
       while (true) {

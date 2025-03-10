@@ -7,9 +7,7 @@ export async function getOneUser(uuid: string, organisationUuid: string): Promis
 }> | null>> {
   try {
     const user = await prismaClient.user.findUnique({
-      where: {
-        uuid
-      },
+      where: { uuid },
       include: {
         organisations: {
           where: {

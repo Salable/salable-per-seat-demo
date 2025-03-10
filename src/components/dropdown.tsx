@@ -5,11 +5,12 @@ import {useOnClickOutside} from "usehooks-ts";
 import {destroySession} from "@/app/actions/sessions";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
-import {Prisma} from "@prisma/client";
+import {User} from "@prisma/client";
 
-export const Dropdown = ({user}: {user: Prisma.UserGetPayload<{
-  include: {organisations: true}
-}> | null}) => {
+export const Dropdown = ({user, isAdmin}: {
+  user: User | null;
+  isAdmin: boolean;
+}) => {
   const router = useRouter();
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -31,7 +32,7 @@ export const Dropdown = ({user}: {user: Prisma.UserGetPayload<{
           {dropDownOpen && (
             <div ref={ref} className='absolute flex flex-col right-0 top-[45px] bg-white width-max-content text-right w-[200px] rounded-sm shadow z-10'>
               <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/dashboard/organisations'} onClick={() => setDropDownOpen(false)}>Organisation</Link>
-              {user.organisations[0].isAdmin ? (
+              {isAdmin ? (
                 <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/dashboard/subscriptions'} onClick={() => setDropDownOpen(false)}>Subscriptions</Link>
               ) : null}
               <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/pricing'} onClick={() => setDropDownOpen(false)}>Pricing</Link>
