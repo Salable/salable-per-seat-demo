@@ -2,13 +2,14 @@
 import {appBaseUrl} from "@/app/constants";
 import {useState} from "react";
 
-export const CopyInviteLink = ({token, licenseUuid}: {token: string, licenseUuid?: string}) => {
+export const CopyInviteLink = ({token, licenseUuid, subscriptionUuid}: {token: string, licenseUuid?: string, subscriptionUuid?: string}) => {
   const [showMessage, setShowMessage] = useState(false)
   const handleClick = async () => {
     try {
       const params = new URLSearchParams()
       params.set('token', token)
       if (licenseUuid) params.set('licenseUuid', licenseUuid)
+      if (subscriptionUuid) params.set('subscriptionUuid', subscriptionUuid)
       await navigator.clipboard.writeText(`${appBaseUrl}/accept-invite?${params.toString()}`);
       setShowMessage(true)
       setTimeout(() => {

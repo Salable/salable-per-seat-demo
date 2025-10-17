@@ -42,6 +42,7 @@ export const AcceptInviteForm = ({organisationName}: {organisationName: string})
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const licenseUuid = searchParams.get('licenseUuid')
+  const subscriptionUuid = searchParams.get('subscriptionUuid')
   const { register, handleSubmit, setError, formState: { errors, isSubmitting,  } } = useForm<FormValues>({ resolver });
   if (!token) {
     return (
@@ -53,7 +54,8 @@ export const AcceptInviteForm = ({organisationName}: {organisationName: string})
       const res = await acceptInvite({
         ...data,
         token,
-        ...(licenseUuid && {licenseUuid})
+        ...(licenseUuid && {licenseUuid}),
+        ...(subscriptionUuid && {subscriptionUuid})
       })
       if (res.error) {
         setError("root.serverError", {

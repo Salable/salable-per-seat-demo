@@ -4,7 +4,7 @@ import {z} from "zod";
 import {getIronSession} from "iron-session";
 import {Session} from "@/app/actions/sign-in";
 import {cookies} from "next/headers";
-import {licenseCheck} from "@/fetch/licenses/check";
+import {entitlementsCheck} from "@/fetch/entitlements/check";
 import {env} from "@/app/environment";
 import {Result} from "@/app/actions/checkout-link";
 
@@ -26,8 +26,8 @@ export const generateString = async (formData: CreateStringRequestBody): Promise
     }
     const bytes = Number(data.bytes)
     if (!bytes) return {data: null, error: 'Invalid bytes size'};
-    const check = await licenseCheck(session.uuid)
-    if (!check.data?.capabilities.find((c) => c.capability === formData.bytes)) {
+    const check = await entitlementsCheck(session.uuid)
+    if (!check.data?.features.find((f) => f.feature === formData.bytes)) {
       return {
         data: null,
         error: 'Unauthorised'

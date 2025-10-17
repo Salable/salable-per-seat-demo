@@ -9,12 +9,15 @@ import {env} from "@/app/environment";
 import {redirect} from "next/navigation";
 import {Result} from "@/app/actions/checkout-link";
 import {Session} from "@/app/actions/sign-in";
+import {salable} from "@/app/salable";
+import {SeatActionType} from "@salable/node-sdk/dist/src/types";
 
 const zodAcceptInviteRequestBody = z.object({
   token: z.string(),
   username: z.string(),
   password: z.string(),
   licenseUuid: z.string().uuid().optional(),
+  subscriptionUuid: z.string().uuid().optional(),
 });
 type AcceptInviteRequestBody = z.infer<typeof zodAcceptInviteRequestBody>
 
@@ -54,6 +57,13 @@ export async function acceptInvite(formData: AcceptInviteRequestBody): Promise<R
     session.organisationUuid = token.organisationUuid
     session.email = user.email
     await session.save();
+    
+    if (data.subscriptionUuid && data.licenseUuid) {
+      await salable.subscriptions.manageSeats(data.subscriptionUuid, [{
+        type: SeatActionType.assign,
+        granteeId: user.uuid
+      }])
+    }
   } catch (error) {
     console.log(error)
     return {

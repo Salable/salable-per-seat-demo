@@ -92,22 +92,18 @@ To remove the requirement of Docker we will change the db provider to `sqlite`.
 
 #### Create Plan
 
-1. Go to the `Plans` tab on the sidebar and select `Create Plan`
-2. Set the plan name as `Basic` and optionally provide a description.
-3. Press `Continue` to configure `License Type` information.
-4. For the type of plan select `Standard`.
-5. Select `Month` for subscription cycle.
-6. Select `Per Seat` license type.
-7. Select `Paid` to make it a paid plan.
-8. Currencies will then appear, input the per seat cost of the plan’s subscription which will be billed to a customer every month.
-9. Continue to `Assign values`.
-10. This is section is for assigning feature values that can be used on pricing tables. This is not required to get set up.
-11. Click `Continue` to `Capabilities`.
-12. Create three capabilities of `16`, `32` and `64`. These will be used to lock features behind the license check in the demo app.
-13. Create Plan.
-14. Repeat the above steps for a `Pro` plan but with the changes in the next steps.
-15. Set a higher monthly cost to the `Basic` plan.
-16. Select all capabilities `16`, `32` and `64` and create a new capability of `128`.
+1. Go to the `Plans` tab and `Create Plan`
+2. Set the plan name as `Basic`.
+3. Select `Per seat` for pricing model.
+4. Select `Month` for subscription cycle.
+5. Select `Paid` to make it a paid plan.
+6. Currencies will then appear, input the cost of 1, this cost will be billed to a customer every month.
+7. Click `Next` to proceed to Features.
+8. This is section is for creating features and assigning values to plans.
+9. Click Create feature and create three different features of type `Boolean`. Name them 16, 32 and 64 with a default value of true.
+10. Repeat the steps to create a Pro plan but set the cost to be 2. Create a new `Boolean` feature called 128 with a default value of false. Click next and ensure its set to false for the existing `Basic` plan. 
+11. Set the feature 128 value to be true on the Pro plan.
+12. Create the plan
 
 ### Update Environment Variables
 

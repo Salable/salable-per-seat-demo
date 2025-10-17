@@ -1,6 +1,6 @@
-import {licenseCheck} from "@/fetch/licenses/check";
+import {entitlementsCheck} from "@/fetch/entitlements/check";
 import React, {Suspense} from "react";
-import {LicenseCheckResponse, StringGeneratorForm} from "@/components/forms/string-generator-form";
+import {StringGeneratorForm} from "@/components/forms/string-generator-form";
 import {getSession} from "@/fetch/session";
 import {bytes} from "@/app/constants";
 import { Result } from "./actions/checkout-link";
@@ -9,7 +9,8 @@ import Link from "next/link";
 import {LockIcon} from "@/components/icons/lock-icon";
 import LoadingSpinner from "@/components/loading-spinner";
 import {isUserAdmin} from "@/fetch/users";
-import {getAllLicenses} from "@/fetch/licenses/get-all";
+import {getAllSubscriptions} from "@/fetch/subscriptions";
+import { EntitlementCheck } from "@salable/node-sdk/dist/src/types";
 
 export const metadata = {
   title: 'Salable Per Seat Demo',
@@ -38,7 +39,7 @@ export default async function Home({searchParams}: {
 
 const StringGenerator = async ({search}: { search: Record<string, string> }) => {
   let isAdmin = false
-  let check: Result<LicenseCheckResponse | null> = {
+  let check: Result<EntitlementCheck | null> = {
     data: null, error: null
   }
   const session = await getSession();
@@ -46,13 +47,12 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
     await new Promise<void>(async (resolve) => {
       while (true) {
         try {
-          const licenses = await getAllLicenses({
-            planUuid: search.planUuid,
-            granteeId: session.uuid,
-            status: 'ACTIVE'
+          const subscriptions = await getAllSubscriptions({
+            owner: session.organisationUuid,
+            planUuid: search.planUuid
           });
-          if (licenses.error) break
-          if (licenses.data?.data.find((l) => l.planUuid === search.planUuid)) {
+          if (subscriptions.error) break
+          if (subscriptions.data?.data.find((s) => s.planUuid === search.planUuid)) {
             resolve()
             break
           }
@@ -66,14 +66,14 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
   }
   if (session?.uuid) {
     isAdmin = await isUserAdmin(session.uuid, session.organisationUuid)
-    check = await licenseCheck(session.uuid)
+    check = await entitlementsCheck(session.uuid)
   }
   return (
     <>
       {!check.error ? (
         <>
           <StringGeneratorForm check={check.data} />
-          {check.data && !check.data.capabilities.find((c) => c.capability === '128') ? (
+          {check.data?.features.length && !check.data.features.find((f) => f.feature === '128') ? (
             <div className='flex justify-center'>
               <div className='max-w-[400px] rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>
@@ -100,7 +100,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
               </div>
             </div>
           ) : null}
-          {!session?.uuid || !check.data && isAdmin ? (
+          {!session?.uuid || !check.data?.features.length && isAdmin ? (
             <div className='flex justify-center max-w-[400px] mx-auto'>
               <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>To start creating secure strings subscribe to a plan from our pricing table and get started!</p>

@@ -5,7 +5,7 @@ import {salableBasicPlanUuid, salableProPlanUuid} from "@/app/constants";
 import {PlanButton} from "@/components/plan-button";
 import React, {Suspense} from "react";
 import {getSession} from "@/fetch/session";
-import {licenseCheck} from "@/fetch/licenses/check";
+import {entitlementsCheck} from "@/fetch/entitlements/check";
 import {FetchError} from "@/components/fetch-error";
 import {isUserAdmin} from "@/fetch/users";
 
@@ -107,7 +107,7 @@ const BasicPlanPricingTableButton = async () => {
       </div>
     )
   }
-  const check = session?.uuid ? await licenseCheck(session.uuid) : {
+  const check = session?.uuid ? await entitlementsCheck(session.uuid) : {
     data: null, error: null
   }
   if (check.error) {
@@ -117,12 +117,12 @@ const BasicPlanPricingTableButton = async () => {
   }
   return (
     <>
-      {check?.data?.capabilities?.find((a) => a.capability === 'basic') ? (
+      {check?.data?.features.find((a) => a.feature === 'basic') ? (
         <div className={`p-4 text-white rounded-md leading-none bg-green-700 font-bold inline-flex items-center w-full justify-center`}>
           <div className='mr-1'><TickIcon fill='#FFF' height={14} width={14}/></div>
           Already subscribed
         </div>
-      ) : check?.data?.capabilities?.find((a) => a.capability === 'pro') && !check?.data?.capabilities?.find((a) => a.capability === 'basic') ? (
+       ) : check?.data?.features.find((a) => a.feature === 'pro') && !check?.data?.features.find((a) => a.feature === 'basic') ? (
         <Link
           href='/dashboard/subscriptions'
           className='block p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition w-full text-center'
@@ -148,7 +148,7 @@ const ProPlanPricingTableButton = async () => {
       </Link>
     )
   }
-  const check = session?.uuid ? await licenseCheck(session.uuid) : {
+  const check = session?.uuid ? await entitlementsCheck(session.uuid) : {
     data: null, error: null
   }
   if (check.error) {
@@ -166,14 +166,14 @@ const ProPlanPricingTableButton = async () => {
   }
   return (
     <>
-      {check?.data?.capabilities?.find((a) => a.capability === 'pro') ? (
+      {check?.data?.features.find((a) => a.feature === 'pro') ? (
         <div
           className={`p-4 text-white rounded-md leading-none bg-green-700 font-bold inline-flex items-center w-full justify-center`}
         >
           <div className='mr-1'><TickIcon fill='#FFF' height={14} width={14}/></div>
           Already subscribed
         </div>
-      ) : check?.data?.capabilities?.find((a) => a.capability === 'basic') && !check?.data?.capabilities?.find((a) => a.capability === 'pro') ? (
+     ) : check?.data?.features.find((a) => a.feature === 'basic') && !check?.data?.features.find((a) => a.feature === 'pro') ? (
         <Link
           href='/dashboard/subscriptions'
           className='block p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition w-full text-center'

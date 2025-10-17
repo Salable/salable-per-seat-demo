@@ -3,7 +3,7 @@ import React, {useRef, useState} from "react";
 import {useOnClickOutside} from "usehooks-ts";
 import { User } from "@prisma/client";
 import {Session} from "@/app/actions/sign-in";
-import {updateLicense} from "@/app/actions/licenses/update";
+import {updateSeat} from "@/app/actions/seats/update";
 import {toast} from "react-toastify";
 import LoadingSpinner from "@/components/loading-spinner";
 import {License} from "@salable/node-sdk/dist/src/types";
@@ -38,15 +38,16 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
-      const updateUser = await updateLicense({
-        uuid: license.uuid,
-        granteeId
+      const updateUser = await updateSeat({
+        subscriptionUuid: subscriptionUuid,
+        granteeId,
+        currentGranteeId: assignedUser?.uuid || null
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
     } catch (e) {
       console.error(e)
-      toast.error('Failed to update license')
+      toast.error('Failed to update seat')
       setIsUpdatingUser(false)
     }
   }
@@ -54,15 +55,16 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
-      const updateUser = await updateLicense({
-        uuid: license.uuid,
-        granteeId: null
+      const updateUser = await updateSeat({
+        subscriptionUuid: subscriptionUuid,
+        granteeId: null,
+        currentGranteeId: assignedUser?.uuid || null
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
     } catch (e) {
       console.error(e)
-      toast.error('Failed to update license')
+      toast.error('Failed to update seat')
       setIsUpdatingUser(false)
     }
   }
