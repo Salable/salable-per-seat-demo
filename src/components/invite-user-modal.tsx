@@ -16,7 +16,6 @@ export const InviteUserModal = ({session, revalidatePage}: {
   revalidatePage: string
 }) => {
   const searchParams = useSearchParams()
-  const licenseUuid = searchParams.get("licenseUuid")
   const subscriptionUuid = searchParams.get("subscriptionUuid")
   const { register, reset, setError, handleSubmit, formState: { errors, isSubmitting } } = useForm<ModalFormValues>();
   const ref = useRef(null)
@@ -35,7 +34,6 @@ export const InviteUserModal = ({session, revalidatePage}: {
         {
           organisationUuid: session.organisationUuid,
           email: values.email,
-          ...(licenseUuid && {licenseUuid}),
           ...(subscriptionUuid && {subscriptionUuid})
         },
         revalidatePage

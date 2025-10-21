@@ -6,7 +6,6 @@ import {Session} from "@/app/actions/sign-in";
 import {updateSeat} from "@/app/actions/seats/update";
 import {toast} from "react-toastify";
 import LoadingSpinner from "@/components/loading-spinner";
-import {License} from "@salable/node-sdk/dist/src/types";
 
 export const AssignUser = (
   {
@@ -14,14 +13,12 @@ export const AssignUser = (
     nonLicensedUsers,
     subscriptionUuid,
     subscriptionStatus,
-    license,
     session
   }: {
     assignedUser: User | null,
     nonLicensedUsers: User[],
     subscriptionUuid: string,
     subscriptionStatus: string,
-    license: License,
     session: Session
   },
 ) => {
@@ -38,10 +35,13 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
+      const seatOperation = assignedUser?.uuid
+        ? { type: 'replace' as const, granteeId: assignedUser.uuid, newGranteeId: granteeId }
+        : { type: 'assign' as const, granteeId };
+      
       const updateUser = await updateSeat({
         subscriptionUuid: subscriptionUuid,
-        granteeId,
-        currentGranteeId: assignedUser?.uuid || null
+        seatOperation
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
@@ -55,10 +55,11 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
+      if (!assignedUser?.uuid) return;
+      
       const updateUser = await updateSeat({
         subscriptionUuid: subscriptionUuid,
-        granteeId: null,
-        currentGranteeId: assignedUser?.uuid || null
+        seatOperation: { type: 'unassign' as const, granteeId: assignedUser.uuid }
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
@@ -71,7 +72,6 @@ export const AssignUser = (
   const handleClickInviteUser = () => {
     const params = new URLSearchParams()
     params.set("modalOpen", "true")
-    params.set("licenseUuid", license.uuid)
     params.set("subscriptionUuid", subscriptionUuid)
     history.pushState(null, '', `?${params.toString()}`)
   }

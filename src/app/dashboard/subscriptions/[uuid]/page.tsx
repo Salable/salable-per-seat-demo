@@ -130,7 +130,6 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                     <AssignUser
                       session={session}
                       assignedUser={assignedUser}
-                      license={l}
                       subscriptionUuid={uuid}
                       subscriptionStatus={subscription.status}
                       nonLicensedUsers={nonLicensedUsers}
@@ -145,8 +144,6 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                 <h2 className='text-lg'>Pending Invites</h2>
                 <div className='mt-3 flex flex-col rounded-sm shadow bg-white'>
                   {users.data.filter((u) => !u.username && u.email).map((u, i) => {
-                    const licenseUuid = seats.data.data.find((l) => l.granteeId === u.uuid)?.uuid
-                    if (!licenseUuid) return null
                     return (
                       <div className='p-3 border-b-2 flex justify-between items-center' key={`users_${i}`}>
                         <div className='flex items-center'>
@@ -155,7 +152,7 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                           </div>
                           {u.email}
                         </div>
-                        <CopyInviteLink token={u.tokens[0].value} licenseUuid={licenseUuid} subscriptionUuid={uuid}/>
+                        <CopyInviteLink token={u.tokens[0].value} subscriptionUuid={uuid}/>
                       </div>
                     );
                   })}

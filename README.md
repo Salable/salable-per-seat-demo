@@ -97,7 +97,7 @@ To remove the requirement of Docker we will change the db provider to `sqlite`.
 3. Select `Per seat` for pricing model.
 4. Select `Month` for subscription cycle.
 5. Select `Paid` to make it a paid plan.
-6. Currencies will then appear, input the cost of 1, this cost will be billed to a customer every month.
+6. Currencies will then appear, input the cost of 1, this cost will be billed to a customer per seat every month.
 7. Click `Next` to proceed to Features.
 8. This is section is for creating features and assigning values to plans.
 9. Click Create feature and create three different features of type `Boolean`. Name them 16, 32 and 64 with a default value of true.

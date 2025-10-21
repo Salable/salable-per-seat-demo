@@ -5,12 +5,11 @@ import {prismaClient} from "../../../../prisma";
 import {revalidatePath} from "next/cache";
 import {redirect} from "next/navigation";
 import {salable} from "@/app/salable";
-import {SeatActionType} from "@salable/node-sdk/dist/src/types";
+import {SeatActionType} from "@/types/seat-action";
 
 const zodCreateTokenRequestBody = z.object({
   organisationUuid: z.string().uuid(),
   email: z.string(),
-  licenseUuid: z.string().uuid().optional(),
   subscriptionUuid: z.string().uuid().optional(),
 });
 
@@ -63,11 +62,11 @@ export async function inviteUser(formData: CreateTokenRequestBody, revalidatePag
         user: true,
       }
     })
-    if (data.subscriptionUuid && data.licenseUuid) {
+    if (data.subscriptionUuid) {
       await salable.subscriptions.manageSeats(data.subscriptionUuid, [{
         type: SeatActionType.assign,
         granteeId: createToken.user.uuid
-      }])
+      }] as Parameters<typeof salable.subscriptions.manageSeats>[1])
     }
   } catch (error) {
     console.log(error)
