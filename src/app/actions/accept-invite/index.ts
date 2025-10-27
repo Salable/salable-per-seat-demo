@@ -9,9 +9,6 @@ import {env} from "@/app/environment";
 import {redirect} from "next/navigation";
 import {Result} from "@/app/actions/checkout-link";
 import {Session} from "@/app/actions/sign-in";
-import {salable} from "@/app/salable";
-import {SeatActionType} from "@/types/seat-action";
-import { ManageSeatOptions } from "@salable/node-sdk/dist/src/types";
 
 const zodAcceptInviteRequestBody = z.object({
   token: z.string(),
