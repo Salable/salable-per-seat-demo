@@ -2,6 +2,7 @@
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
 import {salable} from "@/app/salable";
+import { ManageSeatOptions } from "@salable/node-sdk/dist/src/types";
 
 const manageSeatOptionsSchema = z.discriminatedUnion('type', [
   z.object({
@@ -31,8 +32,8 @@ export async function updateSeat(formData: UpdateSeatRequestBody, revalidatePage
     const data = zodUpdateSeatRequestBody.parse(formData)
     
     await salable.subscriptions.manageSeats(data.subscriptionUuid, [
-      data.seatOperation as Parameters<typeof salable.subscriptions.manageSeats>[1][number]
-    ])
+      data.seatOperation
+    ] as ManageSeatOptions[])
   } catch (error) {
     console.log(error)
     return {

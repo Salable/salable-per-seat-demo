@@ -6,6 +6,7 @@ import {revalidatePath} from "next/cache";
 import {redirect} from "next/navigation";
 import {salable} from "@/app/salable";
 import {SeatActionType} from "@/types/seat-action";
+import { ManageSeatOptions } from "@salable/node-sdk/dist/src/types";
 
 const zodCreateTokenRequestBody = z.object({
   organisationUuid: z.string().uuid(),
@@ -66,7 +67,7 @@ export async function inviteUser(formData: CreateTokenRequestBody, revalidatePag
       await salable.subscriptions.manageSeats(data.subscriptionUuid, [{
         type: SeatActionType.assign,
         granteeId: createToken.user.uuid
-      }] as Parameters<typeof salable.subscriptions.manageSeats>[1])
+      }] as ManageSeatOptions[])
     }
   } catch (error) {
     console.log(error)
