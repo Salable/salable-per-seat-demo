@@ -13,35 +13,31 @@ type FormValues = {
 };
 
 const resolver: Resolver<FormValues> = async (values) => {
-  const errors = () => {
-    const obj: Record<string, {
-      type: string;
-      message: string;
-    }> = {}
-    if (!values.username) {
-      obj.firstName = {
-        type: 'required',
-        message: 'Username is required.',
-      }
+  const obj: Record<string, { type: string; message: string; }> = {}
+  
+  if (!values.username) {
+    obj.username = {
+      type: 'required',
+      message: 'Username is required.',
     }
-    if (!values.password) {
-      obj.password = {
-        type: 'required',
-        message: 'Password is required.',
-      }
-    }
-    return obj
   }
+  if (!values.password) {
+    obj.password = {
+      type: 'required',
+      message: 'Password is required.',
+    }
+  }
+  
   return {
-    values: values ?? {},
-    errors: errors(),
+    values: Object.keys(obj).length === 0 ? values : {},
+    errors: obj,
   };
 };
 
 export const AcceptInviteForm = ({organisationName}: {organisationName: string}) => {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-  const licenseUuid = searchParams.get('licenseUuid')
+  const subscriptionUuid = searchParams.get('subscriptionUuid')
   const { register, handleSubmit, setError, formState: { errors, isSubmitting,  } } = useForm<FormValues>({ resolver });
   if (!token) {
     return (
@@ -53,7 +49,7 @@ export const AcceptInviteForm = ({organisationName}: {organisationName: string})
       const res = await acceptInvite({
         ...data,
         token,
-        ...(licenseUuid && {licenseUuid})
+        ...(subscriptionUuid && {subscriptionUuid})
       })
       if (res.error) {
         setError("root.serverError", {

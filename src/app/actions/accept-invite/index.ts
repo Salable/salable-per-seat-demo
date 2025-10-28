@@ -14,7 +14,7 @@ const zodAcceptInviteRequestBody = z.object({
   token: z.string(),
   username: z.string(),
   password: z.string(),
-  licenseUuid: z.string().uuid().optional(),
+  subscriptionUuid: z.string().uuid().optional(),
 });
 type AcceptInviteRequestBody = z.infer<typeof zodAcceptInviteRequestBody>
 
@@ -54,6 +54,7 @@ export async function acceptInvite(formData: AcceptInviteRequestBody): Promise<R
     session.organisationUuid = token.organisationUuid
     session.email = user.email
     await session.save();
+    
   } catch (error) {
     console.log(error)
     return {

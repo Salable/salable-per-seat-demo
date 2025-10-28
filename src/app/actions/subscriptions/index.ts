@@ -72,8 +72,10 @@ export const addSeats = async ({
         error: 'Unauthorised',
       }
     }
-    const create = await salable.subscriptions.addSeats(uuid, {increment})
-    await pollSalableEvent(create.eventUuid)
+    const result = await salable.subscriptions.updateSeatCount(uuid, {increment})
+    if (result && 'eventUuid' in result) {
+      await pollSalableEvent(result.eventUuid)
+    }
   } catch (error) {
     console.log(error)
     return {
@@ -107,8 +109,10 @@ export const removeSeats = async ({
         error: 'Unauthorised',
       }
     }
-    const remove = await salable.subscriptions.removeSeats(uuid, {decrement})
-    await pollSalableEvent(remove.eventUuid)
+    const result = await salable.subscriptions.updateSeatCount(uuid, {decrement})
+    if (result && 'eventUuid' in result) {
+      await pollSalableEvent(result.eventUuid)
+    }
   } catch (error) {
     console.log(error)
     return {

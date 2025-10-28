@@ -3,10 +3,9 @@ import React, {useRef, useState} from "react";
 import {useOnClickOutside} from "usehooks-ts";
 import { User } from "@prisma/client";
 import {Session} from "@/app/actions/sign-in";
-import {updateLicense} from "@/app/actions/licenses/update";
+import {updateSeat} from "@/app/actions/seats/update";
 import {toast} from "react-toastify";
 import LoadingSpinner from "@/components/loading-spinner";
-import {License} from "@salable/node-sdk/dist/src/types";
 
 export const AssignUser = (
   {
@@ -14,14 +13,12 @@ export const AssignUser = (
     nonLicensedUsers,
     subscriptionUuid,
     subscriptionStatus,
-    license,
     session
   }: {
     assignedUser: User | null,
     nonLicensedUsers: User[],
     subscriptionUuid: string,
     subscriptionStatus: string,
-    license: License,
     session: Session
   },
 ) => {
@@ -38,15 +35,19 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
-      const updateUser = await updateLicense({
-        uuid: license.uuid,
-        granteeId
+      const seatOperation = assignedUser?.uuid
+        ? { type: 'replace' as const, granteeId: assignedUser.uuid, newGranteeId: granteeId }
+        : { type: 'assign' as const, granteeId };
+      
+      const updateUser = await updateSeat({
+        subscriptionUuid: subscriptionUuid,
+        seatOperation
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
     } catch (e) {
       console.error(e)
-      toast.error('Failed to update license')
+      toast.error('Failed to update seat')
       setIsUpdatingUser(false)
     }
   }
@@ -54,22 +55,23 @@ export const AssignUser = (
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
-      const updateUser = await updateLicense({
-        uuid: license.uuid,
-        granteeId: null
+      if (!assignedUser?.uuid) return;
+      
+      const updateUser = await updateSeat({
+        subscriptionUuid: subscriptionUuid,
+        seatOperation: { type: 'unassign' as const, granteeId: assignedUser.uuid }
       }, `/dashboard/subscriptions/${subscriptionUuid}`)
       if (updateUser?.error) toast.error(updateUser.error)
       setIsUpdatingUser(false)
     } catch (e) {
       console.error(e)
-      toast.error('Failed to update license')
+      toast.error('Failed to update seat')
       setIsUpdatingUser(false)
     }
   }
   const handleClickInviteUser = () => {
     const params = new URLSearchParams()
     params.set("modalOpen", "true")
-    params.set("licenseUuid", license.uuid)
     params.set("subscriptionUuid", subscriptionUuid)
     history.pushState(null, '', `?${params.toString()}`)
   }

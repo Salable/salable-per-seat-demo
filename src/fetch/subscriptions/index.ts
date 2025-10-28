@@ -19,7 +19,7 @@ export type GetAllSubscriptionsExpandedPlan = {
   data: SubscriptionExpandedPlan[]
 }
 
-export async function getAllSubscriptions(): Promise<Result<GetAllSubscriptionsExpandedPlan>> {
+export async function getAllSubscriptions(params?: { owner?: string; planUuid?: string }): Promise<Result<GetAllSubscriptionsExpandedPlan>> {
   try {
     const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
     if (!session) {
@@ -36,10 +36,11 @@ export async function getAllSubscriptions(): Promise<Result<GetAllSubscriptionsE
       }
     }
     const data = await salable.subscriptions.getAll({
-      owner: session.organisationUuid,
+      owner: params?.owner || session.organisationUuid,
       expand: ['plan'],
       sort: 'desc',
-      productUuid: salableProductUuid
+      productUuid: salableProductUuid,
+      ...(params?.planUuid && { planUuid: params.planUuid })
     }) as GetAllSubscriptionsExpandedPlan
     return {
       data, error: null
@@ -75,7 +76,7 @@ export async function getOneSubscription(uuid: string): Promise<Result<Subscript
         error: 'Unauthorised',
       }
     }
-    const data = await salable.subscriptions.getOne(uuid, {expand: ['plan.currencies']}) as SubscriptionExpandedPlanCurrency
+    const data = await salable.subscriptions.getOne(uuid, {expand: ['plan']}) as SubscriptionExpandedPlanCurrency
     return {
       data, error: null
     }

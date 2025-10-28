@@ -10,7 +10,7 @@ import {format} from "date-fns";
 import Link from "next/link";
 import {CancelPlanButton} from "@/components/cancel-plan-button";
 import {FetchError} from "@/components/fetch-error";
-import {getAllLicenses} from "@/fetch/licenses/get-all";
+import {getAllSeats} from "@/fetch/seats/get-all";
 import {AssignUser} from "@/components/assign-user";
 import {getAllUsers} from "@/fetch/users";
 import {getSession} from "@/fetch/session";
@@ -98,10 +98,7 @@ const Subscription = async ({subscription}: { subscription: SubscriptionExpanded
 }
 
 const Seats = async ({uuid, subscription, session}: { uuid: string, subscription: SubscriptionExpandedPlanCurrency, session: Session }) => {
-  const seats = await getAllLicenses({
-    subscriptionUuid: uuid,
-    status: subscription.status === 'CANCELED' ? 'CANCELED' : 'ACTIVE'
-  })
+  const seats = await getAllSeats(uuid)
   if (seats.error) return <FetchError error={seats.error}/>
   const users = await getAllUsers(session.organisationUuid)
   if (users.error) return <FetchError error={users.error}/>
@@ -129,11 +126,10 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                 if (l.granteeId === null && subscription.status === 'CANCELED') return null
                 const assignedUser = users.data.find((u) => u.uuid === l.granteeId) ?? null
                 return (
-                  <React.Fragment key={`licenses_${i}`}>
+                  <React.Fragment key={`seats_${i}`}>
                     <AssignUser
                       session={session}
                       assignedUser={assignedUser}
-                      license={l}
                       subscriptionUuid={uuid}
                       subscriptionStatus={subscription.status}
                       nonLicensedUsers={nonLicensedUsers}
@@ -148,8 +144,6 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                 <h2 className='text-lg'>Pending Invites</h2>
                 <div className='mt-3 flex flex-col rounded-sm shadow bg-white'>
                   {users.data.filter((u) => !u.username && u.email).map((u, i) => {
-                    const licenseUuid = seats.data.data.find((l) => l.granteeId === u.uuid)?.uuid
-                    if (!licenseUuid) return null
                     return (
                       <div className='p-3 border-b-2 flex justify-between items-center' key={`users_${i}`}>
                         <div className='flex items-center'>
@@ -158,7 +152,7 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                           </div>
                           {u.email}
                         </div>
-                        <CopyInviteLink token={u.tokens[0].value} licenseUuid={licenseUuid}/>
+                        <CopyInviteLink token={u.tokens[0].value} subscriptionUuid={uuid}/>
                       </div>
                     );
                   })}
