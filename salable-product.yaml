@@ -7,7 +7,7 @@ product:
     - displayName: '16'
       variableName: '16'
       description: ''
-      visibility: private
+      visibility: public
       valueType: boolean
       defaultValue: 'true'
       showUnlimited: false
@@ -15,7 +15,7 @@ product:
     - displayName: '32'
       variableName: '32'
       description: ''
-      visibility: private
+      visibility: public
       valueType: boolean
       defaultValue: 'true'
       showUnlimited: false
@@ -23,7 +23,7 @@ product:
     - displayName: '64'
       variableName: '64'
       description: ''
-      visibility: private
+      visibility: public
       valueType: boolean
       defaultValue: 'true'
       showUnlimited: false
@@ -31,7 +31,7 @@ product:
     - displayName: '128'
       variableName: '128'
       description: ''
-      visibility: private
+      visibility: public
       valueType: boolean
       defaultValue: 'false'
       showUnlimited: false
