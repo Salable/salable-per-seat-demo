@@ -82,32 +82,16 @@ To remove the requirement of Docker we will change the db provider to `sqlite`.
 1. [Sign up](https://salable.app/login) for Salable or [login](https://salable.app/login) if you already have an account.
 2. Ensure you have `Test Mode` enabled.
 
-#### Create Product
+#### Setup Product
 
-1. Go to the Products page and click the `Create Product` button.
-2. Give your product any name.
-3. Tick the `Paid Product` checkbox.
-4. Select the test payment integration that is created for you on sign up. If you already have created a payment integration this can be used instead.
-5. Select whichever default currency you'd prefer.
-
-#### Create Plan
-
-1. Go to the `Plans` tab and `Create Plan`
-2. Set the plan name as `Basic`.
-3. Select `Per seat` for pricing model.
-4. Select `Month` for subscription cycle.
-5. Select `Paid` to make it a paid plan.
-6. Currencies will then appear, input the cost of 1, this cost will be billed to a customer per seat every month.
-7. Click `Next` to proceed to Features.
-8. This is section is for creating features and assigning values to plans.
-9. Click Create feature and create three different features of type `Boolean`. Name them 16, 32 and 64 with a default value of true.
-10. Repeat the steps to create a Pro plan but set the cost to be 2. Create a new `Boolean` feature called 128 with a default value of false. Click next and ensure its set to false for the existing `Basic` plan. 
-11. Set the feature 128 value to be true on the Pro plan.
-12. Create the plan
+1. Go to the Products page in the Salable dashboard and click the `Import product` button.
+2. Navigate to this demo project in the file system on your machine. Select `salable-product.yaml` in the root of the project and import it.
+3. As this is a paid product, you'll need to select a payment integration.
+4. Click `Import file`.
 
 ### Update Environment Variables
 
-1. Copy the Product ID from the "General Settings" tab and assign to `NEXT_PUBLIC_PRODUCT_UUID` in the `.env` file.
+1. Copy the Product ID from the `Overview` tab and assign to `NEXT_PUBLIC_PRODUCT_UUID` in the `.env` file.
 2. Go to `Plans`. Assign the `Basic` ID to `NEXT_PUBLIC_SALABLE_PLAN_UUID` and the `Pro` ID to `NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID`.
 3. Go to `API Keys`.
 4. Copy the API Key that was generated on sign up and assign to `SALABLE_API_KEY`.
