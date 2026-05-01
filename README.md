@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This demo was made for Legacy Salable and won't work correctly with the new version of the platform.
+
 ![Salable Per Seat Pricing Demo](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/per-seat-banner.gif)
 
 This demo application showcases Salable's
